@@ -3,15 +3,25 @@
     <div class="login-box">
       <div class="avatar-box">
         <img src="../assets/img/logo.png" alt>
-        <el-form ref="loginFormRef" :model="loginForm">
-          <el-form-item>
-            <el-input v-model="loginForm.username"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-input v-model="loginForm.userpass"></el-input>
-          </el-form-item>
-        </el-form>
       </div>
+      <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules">
+        <el-form-item prop="username">
+          <el-input v-model="loginForm.username">
+            <i slot="prefix" class="iconfont icon-user"></i>
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="userpass">
+          <el-input v-model="loginForm.userpass">
+            <i slot="prefix" class="iconfont icon-3702mima"></i>
+          </el-input>
+        </el-form-item>
+        <el-row>
+          <el-col :push="15">
+            <el-button type="primary" @click="login()">登录</el-button>
+            <el-button type="info" @click="resetForm">重置</el-button>
+          </el-col>
+        </el-row>
+      </el-form>
     </div>
   </div>
 </template>
@@ -20,10 +30,37 @@
 export default {
   data() {
     return {
+      loginFormRules: {
+        username: [
+          // required:非空  message:错误提示  trigger:触发校验机制
+          { required: true, message: '请输入用户名称', trigger: 'blur' }
+        ],
+        userpass: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+      },
       loginForm: {
         username: '',
         userpass: ''
       }
+    }
+  },
+  methods: {
+    login() {
+      this.$refs.loginFormRef.validate(async vali => {
+        if (vali === true) {
+          const { data: dt } = await this.$http.post('/login', {
+            username: this.loginForm.username,
+            password: this.loginForm.userpass
+          })
+          if (dt.meta.status !== 200) {
+            return this.$message.error(dt.meta.msg)
+          }
+          window.sessionStorage.setItem('token', dt.data.token)
+          this.$router.push('/home')
+        }
+      })
+    },
+    resetForm() {
+      this.$refs.loginFormRef.resetFields()
     }
   }
 }
