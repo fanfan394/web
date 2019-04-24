@@ -11,7 +11,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="userpass">
-          <el-input v-model="loginForm.userpass">
+          <el-input v-model="loginForm.userpass" show-password>
             <i slot="prefix" class="iconfont icon-3702mima"></i>
           </el-input>
         </el-form-item>
@@ -55,6 +55,7 @@ export default {
             return this.$message.error(dt.meta.msg)
           }
           window.sessionStorage.setItem('token', dt.data.token)
+          this.$message(dt.meta.msg)
           this.$router.push('/home')
         }
       })
